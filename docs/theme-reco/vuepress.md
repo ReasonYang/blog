@@ -302,9 +302,7 @@ yarn add -D vue
 
 这将生成一个博客网站模板“my-blog”，其中“docs”文件夹里面是主要的源文件，包括配置和博客文章的 Markdown 文件。我们可以在此基础上，进行修改和定制。
 
-4.初始化主题后修改美化主题。
-
-根据你的喜好，修改配置，美化你的博客。
+初始化主题后修改美化主题。根据你的喜好，修改配置，美化你的博客。
 
 我的项目名称为my-blog，
 
@@ -435,7 +433,115 @@ module.exports = {
     "lineNumbers": true
   }
 }
+
+
 ```
+
+4.提交到GitHub。
+
+本地开发满意后，在 GitHub （也可以是 GitLab等类似的版本控制托管服务）中建立一个代码库，将本地代码提交到代码库中。
+
+建立本地 git 仓库，cd 到你的本地项目根目录下，执行 git init 命令
+
+```
+cd 本地工程根目录
+git init
+```
+
+第2步：将本地项目工作区的所有文件添加到暂存区。小数点 “.” ，意为添加文件夹下的所有文件；也可以将 “.” 换成具体的文件名，如果想添加项目中的指定文件，那就把 “.” 改为指定文件名即可
+
+```
+git add .
+```
+
+第3步：将暂存区的文件提交到本地仓库
+
+```
+git commit -m "注释说明"
+```
+
+第4步：在 github 或者 gitlab 上创建新的repository，本文基于 github 操作，gitlab 类似，不做详述。
+
+然后复制一下远程仓库的https地址。
+
+第5步：将本地代码仓库关联到 github 上
+
+```
+git remote add origin 远程仓库的https地址
+```
+
+如果在这一步时如果出现错误：
+fatal:remote origin already exists
+那就先输入
+
+```
+git remote rm origin
+```
+
+再输入
+
+```
+ git remote add origin 远程仓库的https地址
+```
+
+第6步：将代码由本地仓库上传到 github 远程仓库，依次执行下列语句
+
+*6-1、* 获取远程库与本地同步合并（如果远程库不为空必须做这一步，否则后面的提交会失败）：
+
+```
+git pull --rebase origin master  //不加这句可能报错，原因是 github 中的 README.md 文件不在本地仓库中
+//可以通过该命令进行代码合并
+```
+
+*6-2、* 把当前分支 master 推送到远程，执行此命令后有可能会让输入用户名、密码，或是直接请求授权：
+
+```
+git push -u origin master
+```
+
+在使用git命令进行push和pull时，出现如下报错：
+
+```bash
+fatal: unable to access 'https://github.com/wxler/test.git/': OpenSSL SSL_connect: Connection was reset in connection to github.com:443
+```
+
+### 方案一
+
+在git bash命令行中依次输入以下命令：
+
+```bash
+git config --global http.sslBackend "openssl"
+git config --global http.sslCAInfo "C:\Program Files\Git\mingw64\ssl\cert.pem"
+```
+
+注意上面第二个命令，路径要换成git安装的路径。
+
+### 方案二
+
+如果你使用了神秘手段，很可能是因为DL的问题，这时候设置一下http.proxy就可以了。
+比如我用的VPN是shadow，先查看当前DL使用的端口号，我的端口号是7890。
+
+在git bash命令行中输入以下命令即可：
+
+```bash
+git config --global http.proxy 127.0.0.1:7890
+git config --global https.proxy 127.0.0.1:7890
+```
+
+如果你之前git中已经设置过上述配置，则使用如下命令取消再进行配置即可：
+
+```bash
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+```
+
+### 方案三
+
+可能你的VNP代理服务器节点有问题，有时候更换一个结点就好了，
+
+或是打开一个新的git bash终端，可能是与当前git的会话有关。
+
+至此，操作成功！
 
 ## 3.发布到 Netlify
 
@@ -447,18 +553,30 @@ module.exports = {
 
     ![image-20210617150728940](https://gitee.com/yang-ruisen/picgo/raw/master/img/20210617150729.png)
 
-2. 点击构建，选择你的
+2. 点击构建，选择你创建的Github的仓库（上传了本地开发项目文件的）
 
-3. 新建一个项目，在设置里面填入 GitHub 代码库的链接，填写构建的命令和输出文件夹。
+    ![image-20210617155214954](https://gitee.com/yang-ruisen/picgo/raw/master/img/20210617155215.png)
+
+3. 项目设置里面填入 GitHub 代码库的链接，填写构建的命令和输出文件夹。
 
    按“Deploy site”按钮，耐心等候5分钟左右时间，让构建流程正常结束。
 
-   ![img](https://bobyuan.netlify.app/views/other/guide/asset/netlify_build_settings.png)
+   ![image-20210617161707935](https://gitee.com/yang-ruisen/picgo/raw/master/img/20210617161708.png)
 
-   构建成功后，设置定制的域名。 ![img](https://bobyuan.netlify.app/views/other/guide/asset/netlify_custom_domains.png) 例如这里，我设置了定制的域名"bobyuan"，于是可以这样访问此博客网站： [https://bobyuan.netlify.app/(opens new window)](https://bobyuan.netlify.app/)
+   构建成功后，设置定制的域名。
 
-   1. 【可选】每次提交到 GitHub，Netlify 将自动构建并发布网站。为了了解构建状态，在首页（README.md）中添加一个“status badge”。 ![img](https://bobyuan.netlify.app/views/other/guide/asset/netlify_status_badge.png)
+   ![image-20210617161945421](https://gitee.com/yang-ruisen/picgo/raw/master/img/20210617161945.png)
+
+   例如这里，我设置了定制的域名"reasonyang"，于是可以这样访问此博客网站： 
+
+   [https://reasonyang.netlify.app/]: https://reasonyang.netlify.app
+
+   
+
+   4.【可选】每次提交到 GitHub，Netlify 将自动构建并发布网站。为了了解构建状态，在首页（README.md）中添加一个“status badge”。
+
+   ![image-20210617162405342](https://gitee.com/yang-ruisen/picgo/raw/master/img/20210617162405.png)
 
    ## [#](https://bobyuan.netlify.app/views/other/guide/#小结)小结
 
-   本文简明扼要地给出了基于 VuePress 搭建个人博客网站的全过程，有些技术细节没有提及，读者应该也是技术人员，相信您有能力自行探索或调整。希望本文对您有所帮助。
+   本文简明扼要地给出了基于 VuePress 搭建个人博客网站的全过程，但是有些技术细节可能没有提及，读者在自行搭建时也可能会遇到一些五花八门的bug，不过读者应该也是技术人员，相信您也习以为常，有能力自行探索或调整，新手人员面向baidu、google编程，至此希望本文对您有所帮助。
